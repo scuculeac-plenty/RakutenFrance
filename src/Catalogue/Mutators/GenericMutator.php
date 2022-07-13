@@ -1,4 +1,5 @@
 <?php
+
 namespace RakutenFrance\Catalogue\Mutators;
 
 use Plenty\Modules\Catalog\Contracts\CatalogMutatorContract;

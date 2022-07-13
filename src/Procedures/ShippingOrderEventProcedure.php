@@ -3,41 +3,38 @@
 namespace RakutenFrance\Procedures;
 
 use Exception;
-use Plenty\Modules\Authorization\Services\AuthHelper;
-use Plenty\Modules\EventProcedures\Events\EventProceduresTriggered;
-use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use XMLWriter;
+use Plenty\Plugin\Log\Loggable;
+use Illuminate\Support\Collection;
+use RakutenFrance\API\MarketplaceClient;
+use RakutenFrance\Services\OrderService;
 use Plenty\Modules\Order\Models\OrderItemType;
+use RakutenFrance\Helpers\PluginSettingsHelper;
+use RakutenFrance\Configuration\PluginConfiguration;
+use Plenty\Modules\Authorization\Services\AuthHelper;
+use RakutenFrance\Assistant\AssistantShippingSettings;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Property\Models\OrderPropertyType;
-use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
-use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset;
 use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
 use Plenty\Modules\Wizard\Contracts\WizardDataRepositoryContract;
-use Plenty\Plugin\Log\Loggable;
-use RakutenFrance\API\MarketplaceClient;
-use RakutenFrance\Assistant\AssistantShippingSettings;
-use RakutenFrance\Configuration\PluginConfiguration;
-use RakutenFrance\Helpers\PluginSettingsHelper;
-use RakutenFrance\Services\OrderService;
-use XMLWriter;
-use Illuminate\Support\Collection;
+use Plenty\Modules\EventProcedures\Events\EventProceduresTriggered;
+use Plenty\Modules\Order\Shipping\ParcelService\Models\ParcelServicePreset;
+use Plenty\Modules\Order\Shipping\Contracts\ParcelServicePresetRepositoryContract;
 
 class ShippingOrderEventProcedure
 {
     use Loggable;
 
     const DEFAULT = 'Autre';
-    private $apiClient;
     private $orderService;
     private $authHelper;
     private $settings;
 
     public function __construct(
-        MarketplaceClient $apiClient,
         OrderService $orderService,
         PluginSettingsHelper $pluginSettingsHelper,
         AuthHelper $authHelper
     ) {
-        $this->apiClient = $apiClient;
         $this->orderService = $orderService;
         $this->authHelper = $authHelper;
         $this->settings = $pluginSettingsHelper->getSettings();
@@ -65,7 +62,7 @@ class ShippingOrderEventProcedure
                 }
             );
 
-            $externalOrderValue = Collection::make($order->properties)->where(
+            $externalOrderValue = Collection::make($order->properties)->where( /** @phpstan-ignore-line */
                 'typeId',
                 '=',
                 OrderPropertyType::EXTERNAL_ORDER_ID
@@ -186,8 +183,7 @@ class ShippingOrderEventProcedure
             $writer->writeElement('transporter', $requestData['transporter']);
             $writer->writeElement(
                 'trackingnumber',
-                $this->checkNormalTracking($requestData['transporter']) ? 'yes' :
-                    $packagesNumbers[$key] ?: $packagesNumbers[0] ?: "No tracking number"
+                $this->getTrackingNumber($requestData['transporter'], $packagesNumbers, $key)
             );
             if ($requestData['trackingurl']) {
                 $writer->writeElement('trackingurl', "http://montransporteur.com?trackingNumber=$orderItem");
@@ -212,5 +208,22 @@ class ShippingOrderEventProcedure
             default:
                 return false;
         }
+    }
+
+    private function getTrackingNumber(string $shippingProfile, $packagesNumbers, $key)
+    {
+        if ($this->checkNormalTracking($shippingProfile)) {
+            return 'yes';
+        }
+
+        if (isset($packagesNumbers[$key])) {
+            return $packagesNumbers[$key];
+        }
+
+        if (isset($packagesNumbers[0])) {
+            return $packagesNumbers[0];
+        }
+
+        return "No tracking number";
     }
 }

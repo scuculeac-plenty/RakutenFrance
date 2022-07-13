@@ -2,25 +2,24 @@
 
 namespace RakutenFrance\Catalogue\Services;
 
+use XMLWriter;
 use Carbon\Carbon;
+use Plenty\Plugin\Log\Loggable;
 use Illuminate\Support\Collection;
-use Plenty\Modules\Catalog\Contracts\CatalogExportRepositoryContract;
+use RakutenFrance\Helpers\PluginSettingsHelper;
+use RakutenFrance\Catalogue\Converters\LazyConverter;
+use Plenty\Modules\Catalog\Models\CatalogExportResult;
+use RakutenFrance\Catalogue\Helpers\CatalogueExportHelper;
+use RakutenFrance\Catalogue\Constructors\TemplateConstructor;
 use Plenty\Modules\Catalog\Contracts\CatalogRepositoryContract;
 use Plenty\Modules\Catalog\Contracts\TemplateContainerContract;
-use Plenty\Modules\Catalog\Models\CatalogExportResult;
-use Plenty\Plugin\Log\Loggable;
-use RakutenFrance\Catalogue\Constructors\TemplateConstructor;
-use RakutenFrance\Catalogue\Converters\LazyConverter;
-use RakutenFrance\Catalogue\Helpers\CatalogueExportHelper;
-use RakutenFrance\Helpers\PluginSettingsHelper;
-use XMLWriter;
+use Plenty\Modules\Catalog\Contracts\CatalogExportRepositoryContract;
 
 class CatalogueXmlService extends CatalogueExportHelper
 {
     use Loggable;
 
     private $settings;
-    private $catalogErrorsRepository;
     /**
      * @var XMLWriter
      */
@@ -72,6 +71,7 @@ class CatalogueXmlService extends CatalogueExportHelper
         $catalogService = $this->exportCatalogById($catalog['id']);
         $catalogService->setPage($page);
         $catalogService->setItemsPerPage(500);
+        /** @phpstan-ignore-next-line */
         $catalogService->setUpdatedSince($timestamp ? Carbon::createFromTimestamp($timestamp) : Carbon::now()->subDay());
         $catalogResult = $catalogService->getResult();
 
@@ -130,7 +130,7 @@ class CatalogueXmlService extends CatalogueExportHelper
                         $this->addAttribute(
                             $value['label'],
                             $valueKey,
-                            $value['unit'] ? $variation[$valueKey] : $variation[$valueKey] . ' ' . $variation[$value['unit']] ?? null
+                            $value['unit'] ? $variation[$valueKey] : $variation[$valueKey] . ' ' . $variation[$value['unit']]
                         );
                     }
                 }
@@ -193,6 +193,7 @@ class CatalogueXmlService extends CatalogueExportHelper
                 }
             }
 
+            /** @phpstan-ignore-next-line */
             $marketplaceCollection = Collection::make($image['availabilities'])->where('type', '=', 'marketplace');
             $check = $marketplaceCollection->whereIn('value', [$referrerId, -1])->isNotEmpty();
             if ($check) {

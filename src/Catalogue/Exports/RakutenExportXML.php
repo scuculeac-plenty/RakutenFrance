@@ -121,7 +121,8 @@ class RakutenExportXML extends CatalogueExportHelper
             foreach ($chuck as $variation) {
                 $variationId = $variation['variationId'];
                 if (!$variationId) {
-                    $this->getLogger(__METHOD__)->error(PluginConfiguration::PLUGIN_NAME . '::log.noVariationId',
+                    $this->getLogger(__METHOD__)->error(
+                        PluginConfiguration::PLUGIN_NAME . '::log.noVariationId',
                         ['alias' => $alias]
                     );
                     continue;
@@ -270,7 +271,7 @@ class RakutenExportXML extends CatalogueExportHelper
                         $this->addAttribute(
                             $value['label'],
                             $valueKey,
-                            $value['unit'] ? $variation[$valueKey] : $variation[$valueKey] . ' ' . $variation[$value['unit']] ?? null
+                            $value['unit'] ? $variation[$valueKey] : $variation[$valueKey] . ' ' . $variation[$value['unit']]
                         );
                     }
                 }
@@ -335,6 +336,7 @@ class RakutenExportXML extends CatalogueExportHelper
                 }
             }
 
+            /** @phpstan-ignore-next-line */
             $marketplaceCollection = Collection::make($image['availabilities'])->where('type', '=', 'marketplace');
             $check = $marketplaceCollection->whereIn('value', [$referrerId, -1])->isNotEmpty();
             if ($check) {

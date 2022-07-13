@@ -7,9 +7,9 @@ use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Cron\Contracts\CronHandler;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Payment\Models\Payment;
+use Plenty\Plugin\Log\Loggable;
 use RakutenFrance\API\MarketplaceClient;
 use RakutenFrance\Configuration\PluginConfiguration;
-use Plenty\Plugin\Log\Loggable;
 use RakutenFrance\Helpers\PluginSettingsHelper;
 use RakutenFrance\Services\AddressService;
 use RakutenFrance\Services\ItemService;
@@ -120,11 +120,11 @@ class OrdersImportCron extends CronHandler
         if (empty($billingAddress) || empty($deliveryAddress)) {
             return;
         }
-
+        $country = $this->addressService->getCountryId($customerAddress['country'], $customerAddress['countryalpha2']);
         $orderItems = $this->itemService->createItemOrderLines(
             $marketplaceOrder['items']['item'],
             $this->settings['referrerId'],
-            $this->addressService->getCountryId($customerAddress['country'])
+            $country ? $country->id : 10
         );
 
         $order = $this->orderService->placeOrder(
@@ -132,9 +132,11 @@ class OrdersImportCron extends CronHandler
             $orderItems['items'],
             $deliveryAddress->id,
             $billingAddress->id,
-            (string)$this->settings[PluginSettingsHelper::METHOD_OF_PAYMENT_ID]
+            (string)$this->settings[PluginSettingsHelper::METHOD_OF_PAYMENT_ID],
+            $country ? $country->isoCode2 : 'FR'
         );
 
+        $payment = null;
         if ($order instanceof Order) {
             if ($orderItems['missingItems']) {
                 foreach ($orderItems['missingItems'] as $missingItem) {
@@ -174,7 +176,7 @@ class OrdersImportCron extends CronHandler
      * @param        $customerAddress
      * @param string $email
      *
-     * @return array|null
+     * @return array
      */
     private function createAddresses($customerAddress, $email): array
     {
@@ -192,6 +194,7 @@ class OrdersImportCron extends CronHandler
             'city' => $customerAddress['city'],
             'zipCode' => $customerAddress['zipcode'],
             'country' => $customerAddress['country'],
+            'countryalpha2' => $customerAddress['countryalpha2'],
             'firstName' => $customerAddress['firstname'],
             'lastName' => $customerAddress['lastname'],
             'email' => $email,

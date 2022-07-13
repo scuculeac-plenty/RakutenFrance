@@ -38,7 +38,7 @@ class CatalogueHandler implements WizardSettingsHandler
             $parameters['data'][Catalogue::VALUE_CATALOG_ALIAS]
         );
 
-        if(!$catalog){
+        if (!$catalog) {
             return false;
         }
 

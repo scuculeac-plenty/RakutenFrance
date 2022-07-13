@@ -3,14 +3,17 @@
 namespace RakutenFrance\Services;
 
 use Exception;
-use Plenty\Plugin\Log\Loggable;
+use Illuminate\Support\Collection;
 use Plenty\Exceptions\ValidationException;
-use RakutenFrance\Builders\AddressBuilder;
-use Plenty\Modules\Account\Address\Models\Address;
-use RakutenFrance\Configuration\PluginConfiguration;
 use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
+use Plenty\Modules\Account\Address\Models\Address;
 use Plenty\Modules\Account\Address\Models\AddressOption;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
+use Plenty\Modules\Order\Shipping\Countries\Models\Country;
+use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
+use Plenty\Plugin\Log\Loggable;
+use RakutenFrance\Builders\AddressBuilder;
+use RakutenFrance\Configuration\PluginConfiguration;
 
 class AddressService
 {
@@ -44,10 +47,15 @@ class AddressService
             $addressBuilder = pluginApp(AddressBuilder::class);
 
             $checkedAddress = $this->checkAddress($addressData['address1']);
+            $country = $this->getCountryId($addressData['country'], $addressData['countryalpha2']);
 
             $addressBuilder = $addressBuilder->withNames($addressData['firstName'], $addressData['lastName'])
-                    ->withAddressInformation($checkedAddress['street'], $checkedAddress['houseNumber'], $addressData['city'], $addressData['zipCode'])
-                    ->withCountryId($this->getCountryId($addressData['country']));
+                ->withAddressInformation(
+                    $checkedAddress['street'] ?: $addressData['address1'],
+                    $checkedAddress['houseNumber'],
+                    $addressData['city'],
+                    $addressData['zipCode']
+                )->withCountryId($country ? $country->id : 10);
 
             if (!empty($addressData['email'])) {
                 $addressBuilder = $addressBuilder->withAddressOption(AddressOption::TYPE_EMAIL, $addressData['email']);
@@ -59,19 +67,21 @@ class AddressService
             return $this->addressRepository->createAddress($addressBuilder->done());
         } catch (ValidationException $e) {
             $this->getLogger(__METHOD__)->error(
-                PluginConfiguration::PLUGIN_NAME.'::log.exception',
+                PluginConfiguration::PLUGIN_NAME . '::log.exception',
                 [
                     'error' => $e->getMessageBag(),
                 ]
             );
         } catch (Exception $e) {
             $this->getLogger(__METHOD__)->error(
-                PluginConfiguration::PLUGIN_NAME.'::log.exception',
+                PluginConfiguration::PLUGIN_NAME . '::log.exception',
                 [
                     'error' => $e->getMessage(),
                 ]
             );
         }
+
+        return null;
     }
 
     /**
@@ -83,41 +93,48 @@ class AddressService
      */
     private function checkAddress(string $address): array
     {
-        $removeNumber = preg_match_all('/\d+/', $address, $matches);
+        /** @var LibraryCallContract $libCall */
+        $libCall = pluginApp(LibraryCallContract::class);
+        $split = $libCall->call(PluginConfiguration::PLUGIN_NAME . '::addressSplit', ['address' => $address]);
 
-        if ($removeNumber > 0 or empty($address) == true) {
-            $houseNumber = $matches[0][0];
-
-            $street = str_replace($houseNumber, '', $address);
-        } else {
-            $houseNumber = $address;
-            $street = $address;
+        if (!$split['success']) {
+            return [];
         }
 
-        $address = [
-            'houseNumber' => $houseNumber,
-            'street' => $street,
+        return [
+            'street' => $split['content']['streetName'],
+            'houseNumber' => "{$split['content']['houseNumber']} {$split['content']['additionToAddress2']}"
         ];
-
-        return $address;
     }
 
     /**
      * Get country ID by country name.
      *
-     * @param string $countryName
+     * @param string|null $country
+     * @param string|null $countryISO
      *
-     * @return int
+     * @return Country|null
      */
-    public function getCountryId(string $countryName): int
+    public function getCountryId(string $country = null, string $countryISO = null)
     {
+        /** @var Country[] $countriesList */
         $countriesList = $this->countryRepositoryContract->getCountriesList(1, []);
-        foreach ($countriesList as $country) {
-            if ($country->name === $countryName) {
-                return $country->id;
+        $countriesListCollection = Collection::make($countriesList); /** @phpstan-ignore-line */
+
+        if ($countryISO) {
+            $byCountryISOFound = $countriesListCollection->where('isoCode2', '=', $countryISO)->first();
+            if ($byCountryISOFound instanceof Country) {
+                return $byCountryISOFound;
             }
         }
 
-        return 10; // France
+        if ($country) {
+            $byCountryFound = $countriesListCollection->where('name', '=', $country)->first();
+            if ($byCountryFound instanceof Country) {
+                return $byCountryFound;
+            }
+        }
+
+        return null;
     }
 }

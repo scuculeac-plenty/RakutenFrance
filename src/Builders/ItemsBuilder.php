@@ -8,8 +8,6 @@ class ItemsBuilder
 {
     use Loggable;
 
-    private $variationRepository;
-    private $variationSkuRepository;
     private $orderItem;
 
     public function __construct()
@@ -149,7 +147,7 @@ class ItemsBuilder
 
         return $this;
     }
-    
+
     public function withVatRate(int $vatRate): ItemsBuilder
     {
         $this->orderItem['vatRate'] = $vatRate;

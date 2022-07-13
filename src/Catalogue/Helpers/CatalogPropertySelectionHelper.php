@@ -113,7 +113,8 @@ class CatalogPropertySelectionHelper
             /** @var PropertyGroupName $propertyGroupName */
             $propertyGroupName = pluginApp(PropertyGroupName::class);
             $propertyGroupName->lang = $lang;
-            $propertyGroupName->name = 'Catalog group' . ': ' . PluginConfiguration::PLUGIN_NAME;;
+            $propertyGroupName->name = 'Catalog group' . ': ' . PluginConfiguration::PLUGIN_NAME;
+            ;
             $propertyGroupName->description = 'Catalog group' . ': ' . PluginConfiguration::PLUGIN_NAME;
             $propertyGroupNames[] = $propertyGroupName->toArray();
         }
@@ -157,12 +158,14 @@ class CatalogPropertySelectionHelper
         do {
             $selections = [];
             /** @var PropertySelection[] $searchByPropertyId */
-            $searchByPropertyId = $this->propertySelectionRepositoryContractV2->searchByPropertyId($propertyId,
+            $searchByPropertyId = $this->propertySelectionRepositoryContractV2->searchByPropertyId(
+                $propertyId,
                 ['names'],
                 1000,
                 $page++
             );
             foreach ($searchByPropertyId as $propertySelection) {
+                /** @phpstan-ignore-next-line */
                 $selections[Collection::make($propertySelection->names)->first()->name] = $propertySelection->id;
             }
 

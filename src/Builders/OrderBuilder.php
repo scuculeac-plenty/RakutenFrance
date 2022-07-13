@@ -8,10 +8,6 @@ class OrderBuilder
 {
     /** @var array */
     private $order = [];
-    
-    public function __construct()
-    {
-    }
 
     /**
      * Assign plenty ID and Order type
@@ -21,18 +17,14 @@ class OrderBuilder
      *
      * @return OrderBuilder
      */
-    public function prepare(int $type, int $plentyId = 0): OrderBuilder
+    public function prepare(int $type, int $plentyId): OrderBuilder
     {
-        if ($plentyId === 0) {
-            $plentyId = pluginApp(Application::class)->getPlentyId();
-        }
-        
         $this->order['typeId'] = $type;
         $this->order['plentyId'] = $plentyId;
-        
+
         return $this;
     }
-    
+
     /**
      * Add order item lines
      *
@@ -45,10 +37,10 @@ class OrderBuilder
         foreach ($orderItems as $orderItem) {
             $this->withOrderItem($orderItem);
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Add order item line
      *
@@ -61,13 +53,13 @@ class OrderBuilder
         if ($this->order['orderItems'] === null) {
             $this->order['orderItems'] = [];
         }
-        
+
         array_push($this->order['orderItems'], $orderItem);
-        
+
         return $this;
     }
-    
-    
+
+
     /**
      * Add address relation
      *
@@ -81,17 +73,17 @@ class OrderBuilder
         if ($this->order['addressRelations'] === null) {
             $this->order['addressRelations'] = [];
         }
-        
+
         $address = [
             'typeId'    => $type,
             'addressId' => $addressId
         ];
-        
+
         array_push($this->order['addressRelations'], $address);
-        
+
         return $this;
     }
-    
+
     /**
      * Add contact relation
      *
@@ -106,15 +98,15 @@ class OrderBuilder
         if ($this->order['relations'] === null) {
             $this->order['relations'] = [];
         }
-        
+
         $relation = [
             'referenceType' => $type,
             'relation'      => $relationType,
             'referenceId'   => $referenceId
         ];
-        
+
         array_push($this->order['relations'], $relation);
-        
+
         return $this;
     }
 
@@ -131,15 +123,15 @@ class OrderBuilder
         if ($this->order['properties'] === null) {
             $this->order['properties'] = [];
         }
-    
+
         $option =
         [
             'typeId' => $type,
             'value'  => $value
         ];
-        
+
         array_push($this->order['properties'], $option);
-        
+
         return $this;
     }
 

@@ -14,14 +14,12 @@ class CatalogueFiltersHelper
     const STATUS_SENT = 'SENT';
 
     const ITEM_HAS_IDS = 'item.hasIds';
-    const VARIATION_ACTIvE = 'variationBase.isActive';
+    const VARIATION_ACTIVE = 'variationBase.isActive';
     const VARIATION_IS_VISIBLE_FOR_MARKETPLACE = 'variationMarket.isVisibleForMarket';
     const VARIATION_IS_VISIBLE_FOR_ATLEAST_ONE_MARKETPLACE = 'variationMarket.isVisibleForAtLeastOneMarket';
     const VARIATION_PROPERTY_HAS_SELECTION = 'variationProperty.hasSelection';
     const VARIATION_HAS_SKU = 'variationSku.hasSku';
-    /**
-     * @var
-     */
+
     private $filters = [];
 
     /**
@@ -42,7 +40,7 @@ class CatalogueFiltersHelper
     public function setVariationIsActive(): CatalogueFiltersHelper
     {
         $this->filters[] = [
-            'name' => self::VARIATION_ACTIvE,
+            'name' => self::VARIATION_ACTIVE,
             'params' => [
                 'active' => true
             ]

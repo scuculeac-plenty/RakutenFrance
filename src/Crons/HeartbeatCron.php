@@ -1,4 +1,5 @@
 <?php
+
 namespace RakutenFrance\Crons;
 
 use Plenty\Plugin\Application;

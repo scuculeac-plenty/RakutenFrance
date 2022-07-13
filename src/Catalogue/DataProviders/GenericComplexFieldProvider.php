@@ -17,6 +17,7 @@ class GenericComplexFieldProvider implements CatalogMappingValueProviderContract
      */
     public function set(array $fields): void
     {
+        /** @phpstan-ignore-next-line */
         $this->fields = Collection::make($fields)->mapWithKeys(function ($item) {
             return [
                 $item['value'] => [

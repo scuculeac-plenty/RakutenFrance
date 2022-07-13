@@ -136,7 +136,6 @@ class CatalogueExportHelper
         $errors = [];
         $valid = true;
         if (!$variation) {
-            unset($variation['_meta']);
             return ['valid' => false, 'errors' => [['Catalog' => 'Variation failed.', 'variation' => $variation]]];
         }
 

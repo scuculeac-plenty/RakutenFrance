@@ -1,0 +1,16 @@
+parameters:
+	level: 5
+	phpVersion: 80000
+	reportUnmatchedIgnoredErrors: false
+	paths:
+		- src
+	scanDirectories:
+		- ./vendor/hashtages/plugin-interface
+	excludePaths:
+		analyse:
+			- src/Models
+			- src/Validators
+			- src/Catalogue/TemplateProviders
+			- src/Catalogue/Database/Models
+			- src/Catalogue/Converters/LazyConverter
+	ignoreErrors:

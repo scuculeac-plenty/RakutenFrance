@@ -1,5 +1,13 @@
 # Release Notes for Rakuten.fr
 
+## v1.0.12 (2022-07-04)
+
+- Changed order address split for orders
+- Changed order country assignment (Primary:CountryAlpha2 and Fallback:Country)
+- Changed stock warehouse filter by warehouse referrer
+- Fixed assigning correct plentyId for orders from assistant settings
+- Fixed `ShippingOrderEventProcedure` for PHP8
+
 ## v1.0.11 (2021-11-26)
 
 - Added Converters to catalogue

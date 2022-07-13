@@ -123,7 +123,7 @@ class Catalogue extends WizardProvider
         /** @var MarketplaceClient $productTypes */
         $productTypes = pluginApp(MarketplaceClient::class)->getAliases()['producttypetemplate'];
         $catalogueList = [];
-        foreach ($productTypes as $catalog) {
+        foreach ($productTypes as $catalog) { /** @phpstan-ignore-line */
             $catalogueList[] = [
                 'caption' => $catalog['label'] . " [" . $catalog['alias'] . "]",
                 'value' => $catalog['alias'],

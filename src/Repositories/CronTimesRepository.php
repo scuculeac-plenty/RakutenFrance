@@ -32,15 +32,19 @@ class CronTimesRepository
      * Find timestamp by type
      *
      * @param string $type
-     * @param null $setDefaultTimestamp
+     * @param int|false $setDefaultTimestamp
      *
      * @return CronTimes
      */
-    public function findByType(string $type, $setDefaultTimestamp = null): CronTimes
+    public function findByType(string $type, $setDefaultTimestamp): CronTimes
     {
+        if (!$setDefaultTimestamp) {
+            $setDefaultTimestamp = strtotime("-2 days");
+        }
+
         $cronTime = $this->getByType($type)[0];
         if (!$cronTime instanceof CronTimes) {
-            $cronTime = $this->save(['type' => $type, 'timestamp' => $setDefaultTimestamp ?? strtotime("-2 days")]);
+            $cronTime = $this->save(['type' => $type, 'timestamp' => $setDefaultTimestamp]);
         }
 
         return $cronTime;

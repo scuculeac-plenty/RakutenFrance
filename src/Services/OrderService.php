@@ -14,6 +14,7 @@ use Plenty\Modules\Order\Property\Models\OrderPropertyType;
 use RakutenFrance\Builders\OrderBuilder;
 use RakutenFrance\Configuration\PluginConfiguration;
 use Plenty\Plugin\Log\Loggable;
+use RakutenFrance\Helpers\PluginSettingsHelper;
 
 class OrderService
 {
@@ -29,12 +30,19 @@ class OrderService
      */
     private $authHelper;
 
+    /**
+     * @var array
+     */
+    private $settings;
+
     public function __construct(
         OrderRepositoryContract $orderRepositoryContract,
-        AuthHelper $authHelper
+        AuthHelper $authHelper,
+        PluginSettingsHelper $settings
     ) {
         $this->orderRepositoryContract = $orderRepositoryContract;
         $this->authHelper = $authHelper;
+        $this->settings = $settings->getSettings();
     }
 
     /**
@@ -45,6 +53,7 @@ class OrderService
      * @param int $deliveryAddressId
      * @param int $billingAddressId
      * @param string $mop
+     * @param string $countryISO
      *
      * @return Order|null
      */
@@ -53,19 +62,20 @@ class OrderService
         array $orderItems,
         int $deliveryAddressId,
         int $billingAddressId,
-        string $mop
+        string $mop,
+        string $countryISO
     ) {
         try {
             /** @var OrderBuilder $orderBuilder */
             $orderBuilder = pluginApp(OrderBuilder::class);
 
-            $orderBuilder = $orderBuilder->prepare(OrderType::TYPE_SALES_ORDER)
+            $orderBuilder = $orderBuilder->prepare(OrderType::TYPE_SALES_ORDER, (int)$this->settings[PluginSettingsHelper::APPLICATION_ID])
                 ->withOrderItems($orderItems)
                 ->withAddressId($billingAddressId, AddressRelationType::BILLING_ADDRESS)
                 ->withAddressId($deliveryAddressId, AddressRelationType::DELIVERY_ADDRESS)
                 ->withOrderProperty(OrderPropertyType::PAYMENT_METHOD, $mop)
-                ->withOrderProperty(OrderPropertyType::EXTERNAL_ORDER_ID, $externalOrderId);
-
+                ->withOrderProperty(OrderPropertyType::EXTERNAL_ORDER_ID, $externalOrderId)
+                ->withOrderProperty(OrderPropertyType::DOCUMENT_LANGUAGE, $countryISO);
 
             return $this->authHelper->processUnguarded(
                 function () use ($orderBuilder) {

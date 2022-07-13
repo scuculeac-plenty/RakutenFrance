@@ -48,152 +48,152 @@ class AssistantShippingSettings extends WizardProvider
      */
     private function getCarrierCodeList(): array
     {
-        return array(
-            array(
+        return [
+            [
                 'caption' => 'Colis Prive',
                 'value' => 'Colis Prive',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'So Colissimo',
                 'value' => 'So Colissimo',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Colissimo',
                 'value' => 'Colissimo',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Geodis',
                 'value' => 'Geodis',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'WeDo Logistics',
                 'value' => 'WeDo Logistics',
-            ),
-            array(
+            ],
+            [
                 'caption' => '4PX',
                 'value' => '4PX',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Autre',
                 'value' => 'Autre',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'DPD',
                 'value' => 'DPD',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Mondial Relay',
                 'value' => 'Mondial Relay',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Mondial Relay prépayé',
                 'value' => 'Mondial Relay prépayé',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Chronopost',
                 'value' => 'Chronopost',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'TNT',
                 'value' => 'TNT',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'UPS',
                 'value' => 'UPS',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Fedex',
                 'value' => 'Fedex',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Tatex',
                 'value' => 'Tatex',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'GLS',
                 'value' => 'GLS',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'DHL',
                 'value' => 'DHL',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'France Express',
                 'value' => 'France Express',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Kiala',
                 'value' => 'Kiala',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Cubyn',
                 'value' => 'Cubyn',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'DPD Germany',
                 'value' => 'DPD Germany',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'DPD UK',
                 'value' => 'DPD UK',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'B2C Europe',
                 'value' => 'B2C Europe',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'TrackYourParcel',
                 'value' => 'TrackYourParcel',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Yun Express',
                 'value' => 'Yun Express',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'China EMS',
                 'value' => 'China EMS',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Swiss Post',
                 'value' => 'Swiss Post',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Courrier Suivi',
                 'value' => 'Courrier Suivi',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'PostNL International',
                 'value' => 'PostNL International',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Royal Mail',
                 'value' => 'Royal Mail',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'CNE Express',
                 'value' => 'CNE Express',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'S.F. Express',
                 'value' => 'S.F. Express',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Singapore Post',
                 'value' => 'Singapore Post',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Hong Kong Post',
                 'value' => 'Hong Kong Post',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Bpost',
                 'value' => 'Bpost',
-            ),
-            array(
+            ],
+            [
                 'caption' => 'Autre',
                 'value' => 'Autre',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

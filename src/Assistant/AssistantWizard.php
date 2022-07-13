@@ -21,6 +21,7 @@ class AssistantWizard extends WizardProvider
     const VALUE_RAKUTEN_TOKEN = 'rakutenToken';
     const VALUE_RAKUTEN_PROFILE_ID = 'rakutenProfileId';
     const VALUE_RAKUTEN_PROFILE_STOCK_ID = 'rakutenProfileStockId';
+    const VALUE_RAKUTEN_PLENTY_ID = 'plentyId';
 
     //Order settings
     const VALUE_CANCELLATION_TEXT = 'defaultCancellationText';
@@ -217,7 +218,7 @@ class AssistantWizard extends WizardProvider
     public function getUserList(): array
     {
         $users = $this->userRepositoryContract->getAll();
-        $userList = array();
+        $userList = [];
         /** @var User $user */
         foreach ($users as $user) {
             $userList[] = [

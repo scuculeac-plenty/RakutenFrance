@@ -14,11 +14,11 @@ class CreateMarketplacePaymentMethod
     public function run(): void
     {
         try {
-            $paymentMethodData = array(
+            $paymentMethodData = [
                 'pluginKey' => PluginConfiguration::PLUGIN_KEY,
                 'paymentKey' => PluginConfiguration::PLUGIN_NAME,
                 'name' => PluginConfiguration::PLUGIN_NAME,
-            );
+            ];
             pluginApp(PaymentMethodRepositoryContract::class)->createPaymentMethod($paymentMethodData);
         } catch (Exception $e) {
             $this->getLogger(__METHOD__)->error(PluginConfiguration::PLUGIN_NAME . '::log.exception', [

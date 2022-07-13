@@ -89,7 +89,7 @@ class SynchronizeCatalogErrorsCron extends CronHandler
             if (!@$product['data']) {
                 continue;
             }
-            $parseCSV = str_getcsv($product['data'],';');
+            $parseCSV = str_getcsv($product['data'], ';');
             $isFound = $this->find($parseCSV[0]);
             if (!$isFound) {
                 continue;
@@ -150,7 +150,7 @@ class SynchronizeCatalogErrorsCron extends CronHandler
         if ($findVariationById) {
             return $findVariationById;
         }
-        $findVariationByNumber = @$this->findVariationByNumber((int)$sku);
+        $findVariationByNumber = @$this->findVariationByNumber((string)$sku);
         if ($findVariationByNumber) {
             return $findVariationByNumber;
         }
@@ -172,13 +172,12 @@ class SynchronizeCatalogErrorsCron extends CronHandler
                 ]
             );
             /** @var Variation[] $searchResult */
-            if (@$searchResult[0]) {
-                return $searchResult[0]->variationId;
+            if (@$searchResult[0]) { /** @phpstan-ignore-line */
+                return $searchResult[0]->variationId; /** @phpstan-ignore-line */
             }
         } catch (\Exception $e) {
             return null;
         }
-        return null;
     }
 
     /**

@@ -6,7 +6,7 @@
   },
   "namespace": "RakutenFrance",
   "type": "backend",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "license": "Copyright by hashtagES",
   "isClosedSource": true,
   "price": 0.00,
@@ -34,6 +34,12 @@
   "email": "hello@hashtages.com",
   "phone": "+49 (0) 4264-776949-5",
   "serviceProvider": "RakutenFrance\\Providers\\PluginServiceProvider",
+  "dependencies": {
+    "viison/address-splitter": "^0.3.4"
+  },
+  "platform": {
+    "php": ">=7.3 <8.1"
+  },
   "runOnBuild": [
     "RakutenFrance\\Catalogue\\Database\\Migrations\\CreateCatalogTable",
     "RakutenFrance\\Catalogue\\Database\\Migrations\\CreateCatalogHistoryTable",

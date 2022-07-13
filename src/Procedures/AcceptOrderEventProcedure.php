@@ -3,27 +3,25 @@
 namespace RakutenFrance\Procedures;
 
 use Exception;
-use Illuminate\Support\Collection;
-use Plenty\Exceptions\ValidationException;
-use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
-use Plenty\Modules\Account\Address\Models\AddressOption;
-use Plenty\Modules\EventProcedures\Events\EventProceduresTriggered;
-use Plenty\Modules\Order\Contracts\OrderItemRepositoryContract;
-use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
-use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Order\Models\OrderItem;
-use Plenty\Modules\Order\Models\OrderItemType;
-use Plenty\Modules\Order\Property\Models\OrderPropertyType;
-use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
-use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
-use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Plugin\Log\Loggable;
-use RakutenFrance\API\MarketplaceClient;
-use RakutenFrance\Configuration\PluginConfiguration;
+use Illuminate\Support\Collection;
+use Plenty\Modules\Order\Models\Order;
 use RakutenFrance\Helpers\Iso2ToUnCode;
-use RakutenFrance\Helpers\PluginSettingsHelper;
+use RakutenFrance\API\MarketplaceClient;
 use RakutenFrance\Services\OrderService;
+use Plenty\Exceptions\ValidationException;
+use Plenty\Modules\Order\Models\OrderItem;
+use Plenty\Modules\Payment\Models\Payment;
 use RakutenFrance\Services\PaymentService;
+use Plenty\Modules\Order\Models\OrderItemType;
+use RakutenFrance\Helpers\PluginSettingsHelper;
+use RakutenFrance\Configuration\PluginConfiguration;
+use Plenty\Modules\Account\Address\Models\AddressOption;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Property\Models\OrderPropertyType;
+use Plenty\Modules\EventProcedures\Events\EventProceduresTriggered;
+use Plenty\Modules\Account\Address\Contracts\AddressRepositoryContract;
+use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 
 /**
  * Class AcceptOrderEventProcedure
@@ -55,17 +53,9 @@ class AcceptOrderEventProcedure
      */
     private $addressRepositoryContract;
     /**
-     * @var PaymentRepositoryContract
-     */
-    private $paymentRepositoryContract;
-    /**
      * @var PaymentService
      */
     private $paymentService;
-    /**
-     * @var OrderItemRepositoryContract
-     */
-    private $orderItemRepositoryContract;
     /**
      * @var CountryRepositoryContract
      */
@@ -79,9 +69,7 @@ class AcceptOrderEventProcedure
      * @param PluginSettingsHelper        $pluginSettingsHelper
      * @param OrderRepositoryContract     $orderRepositoryContract
      * @param AddressRepositoryContract   $addressRepositoryContract
-     * @param PaymentRepositoryContract   $paymentRepositoryContract
      * @param PaymentService              $paymentService
-     * @param OrderItemRepositoryContract $orderItemRepositoryContract
      * @param CountryRepositoryContract   $countryRepositoryContract
      */
     public function __construct(
@@ -90,9 +78,7 @@ class AcceptOrderEventProcedure
         PluginSettingsHelper $pluginSettingsHelper,
         OrderRepositoryContract $orderRepositoryContract,
         AddressRepositoryContract $addressRepositoryContract,
-        PaymentRepositoryContract $paymentRepositoryContract,
         PaymentService $paymentService,
-        OrderItemRepositoryContract $orderItemRepositoryContract,
         CountryRepositoryContract $countryRepositoryContract
     ) {
         $this->apiClient = $apiClient;
@@ -100,9 +86,7 @@ class AcceptOrderEventProcedure
         $this->settings = $pluginSettingsHelper->getSettings();
         $this->orderRepositoryContact = $orderRepositoryContract;
         $this->addressRepositoryContract = $addressRepositoryContract;
-        $this->paymentRepositoryContract = $paymentRepositoryContract;
         $this->paymentService = $paymentService;
-        $this->orderItemRepositoryContract = $orderItemRepositoryContract;
         $this->countryRepositoryContract = $countryRepositoryContract;
     }
 
@@ -132,12 +116,14 @@ class AcceptOrderEventProcedure
                 }
                 $acceptOrderItem = $this->apiClient->acceptItem($externalItemId, $unCode);
 
-                $this->getLogger(__FUNCTION__)->debug(PluginConfiguration::PLUGIN_NAME . '::log.acceptOrderItem',
+                $this->getLogger(__FUNCTION__)->debug(
+                    PluginConfiguration::PLUGIN_NAME . '::log.acceptOrderItem',
                     [
                         'externalItemId' => $externalItemId,
                         'unCode' => $unCode,
                         'acceptOrderItem' => $acceptOrderItem
-                    ]);
+                    ]
+                );
 
                 if ($acceptOrderItem !== 'Accepted') {
                     $commentData = [
@@ -153,7 +139,7 @@ class AcceptOrderEventProcedure
                 }
             }
 
-            $externalOrderId = (string)Collection::make($order->properties)->where(
+            $externalOrderId = (string)Collection::make($order->properties)->where( /** @phpstan-ignore-line */
                 'typeId',
                 '=',
                 OrderPropertyType::EXTERNAL_ORDER_ID
@@ -166,11 +152,13 @@ class AcceptOrderEventProcedure
             $billingInfo = $this->apiClient->getBillingInfo($externalOrderId);
             $shippingInfo = $this->apiClient->getShippingInfo($externalOrderId);
 
-            $this->getLogger(__FUNCTION__)->debug(PluginConfiguration::PLUGIN_NAME . '::log.billAndShipInfo',
+            $this->getLogger(__FUNCTION__)->debug(
+                PluginConfiguration::PLUGIN_NAME . '::log.billAndShipInfo',
                 [
                     'billingInfo' => $billingInfo,
                     'shippingInfo' => $billingInfo,
-                ]);
+                ]
+            );
 
             if ($billingInfo['billinginformation']) {
                 $this->updateBillingInformation($billingInfo, $externalOrderId, $order);
@@ -219,7 +207,7 @@ class AcceptOrderEventProcedure
      * @param       $billingItems
      * @param Order $order
      *
-     * @return Order|null
+     * @return Order
      */
     private function updateOrderItems($billingItems, Order $order)
     {
@@ -236,9 +224,7 @@ class AcceptOrderEventProcedure
         $shippingCostsItem = &$order->orderItems->where('typeId', '=', OrderItemType::TYPE_SHIPPING_COSTS)->first();
         $shippingCostsItem->systemAmount->priceOriginalGross = $shippingCostAmount;
 
-        $updatedOrder = $this->orderRepositoryContact->updateOrder($order->toArray(), $order->id);
-
-        return $updatedOrder ?? null;
+        return $this->orderRepositoryContact->updateOrder($order->toArray(), $order->id);
     }
 
     /**

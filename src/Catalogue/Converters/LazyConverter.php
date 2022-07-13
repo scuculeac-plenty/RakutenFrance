@@ -20,6 +20,10 @@ class LazyConverter extends BaseResultConverter
         return 'GENERIC';
     }
 
-    protected function convertToMarketplace(CatalogLazyCollection $collection) {}
-    protected function convertToDownload(CatalogLazyCollection $collection, ResourceHandler $resourceHandler) {}
+    protected function convertToMarketplace(CatalogLazyCollection $collection)
+    {
+    }
+    protected function convertToDownload(CatalogLazyCollection $collection, ResourceHandler $resourceHandler)
+    {
+    }
 }

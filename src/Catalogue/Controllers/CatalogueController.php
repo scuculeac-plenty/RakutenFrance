@@ -42,7 +42,7 @@ class CatalogueController extends Controller
      *
      * @param Request $request
      *
-     * @return array|string[]
+     * @return array
      */
     public function raw(Request $request): array
     {
@@ -61,10 +61,11 @@ class CatalogueController extends Controller
         /** @var CatalogExportRepositoryContract $catalogExportRepository */
         $catalogExportRepository = pluginApp(CatalogExportRepositoryContract::class);
         $exportService = $catalogExportRepository->exportById($catalog['id']);
+        /** @phpstan-ignore-next-line */
         $exportService->setUpdatedSince($timestamp ? Carbon::createFromTimestamp($timestamp) : Carbon::now()->subDay());
         $catalogExportResult = $exportService->getResult();
 
-        foreach ($catalogExportResult as $page) {
+        foreach ($catalogExportResult as $page) { /** @phpstan-ignore-line */
             $resultArray = array_merge($resultArray, $page);
         }
 
@@ -79,7 +80,7 @@ class CatalogueController extends Controller
      *
      * @param Request $request
      *
-     * @return array|string[]
+     * @return array
      */
     public function template(Request $request): array
     {

@@ -71,7 +71,7 @@ class AddressBuilder
             'value' => $value,
         ];
 
-        array_push($this->address['options'], $option);
+        $this->address['options'][] = $option;
 
         return $this;
     }
@@ -109,7 +109,7 @@ class AddressBuilder
             'isPrimary' => $isPrimary,
         ];
 
-        array_push($this->address['contactRelations'], $contactRelations);
+        $this->address['contactRelations'][] = $contactRelations;
 
         return $this;
     }

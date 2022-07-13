@@ -57,7 +57,7 @@ class ItemService
                 if (empty($marketplaceItem['sku'])) {
                     $marketplaceItem['sku'] = $marketplaceItem['itemid'];
                 }
-                
+
                 $variation = $this->getVariation($marketplaceItem['sku'], $referrerId);
                 $itemType = OrderItemType::TYPE_VARIATION;
                 $variationId = $variation->id;

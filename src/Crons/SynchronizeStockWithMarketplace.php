@@ -4,18 +4,21 @@ namespace RakutenFrance\Crons;
 
 use DateTime;
 use Exception;
-use Plenty\Modules\Cron\Contracts\CronHandler;
-use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
-use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
-use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
-use Plenty\Plugin\Log\Loggable;
-use Plenty\Repositories\Models\PaginatedResult;
 use RakutenFrance\API\Api;
-use RakutenFrance\Catalogue\Database\Repositories\CatalogHistoryRepository;
-use RakutenFrance\Configuration\PluginConfiguration;
-use RakutenFrance\Helpers\PluginSettingsHelper;
+use Plenty\Plugin\Log\Loggable;
 use RakutenFrance\Helpers\PriceHelper;
+use Plenty\Modules\Cron\Contracts\CronHandler;
+use RakutenFrance\Helpers\PluginSettingsHelper;
 use RakutenFrance\Repositories\CronTimesRepository;
+use RakutenFrance\Configuration\PluginConfiguration;
+use Plenty\Modules\StockManagement\Stock\Models\Stock;
+use Plenty\Modules\Item\VariationStock\Models\VariationStock;
+use Plenty\Modules\Plugin\Libs\Contracts\LibraryCallContract;
+use Plenty\Modules\StockManagement\Warehouse\Models\Warehouse;
+use Plenty\Modules\Item\Variation\Contracts\VariationRepositoryContract;
+use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
+use Plenty\Modules\Item\VariationStock\Contracts\VariationStockRepositoryContract;
+use Plenty\Modules\StockManagement\Warehouse\Contracts\WarehouseRepositoryContract;
 
 /**
  * Class SynchronizeStockWithMarketplace
@@ -43,46 +46,61 @@ class SynchronizeStockWithMarketplace extends CronHandler
      */
     private $libraryCallContract;
     /**
-     * @var CatalogHistoryRepository
-     */
-    private $catalogHistoryRepository;
-    /**
      * @var CronTimesRepository
      */
     private $cronTimesRepository;
+    /**
+     * @var WarehouseRepositoryContract
+     */
+    private $warehouseRepositoryContract;
+    /**
+     * @var VariationStockRepositoryContract
+     */
+    private $variationStockRepositoryContract;
+    /**
+     * @var array
+     */
+    private $warehouses;
 
     /**
      * SynchronizeStockWithMarketplace constructor.
      *
      * @param VariationRepositoryContract $variationRepositoryContract
-     * @param PluginSettingsHelper        $pluginSettingsHelper
-     * @param PriceHelper                 $priceHelper
-     * @param LibraryCallContract         $libraryCallContract
-     * @param CronTimesRepository         $cronTimesRepository
+     * @param PluginSettingsHelper $pluginSettingsHelper
+     * @param PriceHelper $priceHelper
+     * @param LibraryCallContract $libraryCallContract
+     * @param CronTimesRepository $cronTimesRepository
+     * @param WarehouseRepositoryContract $warehouseRepositoryContract
+     * @param VariationStockRepositoryContract $variationStockRepositoryContract
      */
     public function __construct(
         VariationRepositoryContract $variationRepositoryContract,
         PluginSettingsHelper $pluginSettingsHelper,
         PriceHelper $priceHelper,
         LibraryCallContract $libraryCallContract,
-        CronTimesRepository $cronTimesRepository
+        CronTimesRepository $cronTimesRepository,
+        WarehouseRepositoryContract $warehouseRepositoryContract,
+        VariationStockRepositoryContract $variationStockRepositoryContract
     ) {
         $this->variationRepositoryContract = $variationRepositoryContract;
         $this->settings = $pluginSettingsHelper->getSettings();
         $this->priceHelper = $priceHelper;
         $this->libraryCallContract = $libraryCallContract;
         $this->cronTimesRepository = $cronTimesRepository;
+        $this->warehouseRepositoryContract = $warehouseRepositoryContract;
+        $this->variationStockRepositoryContract = $variationStockRepositoryContract;
     }
 
-    public function handle()
+    public function handle(): void
     {
-        if ($this->settings[PluginSettingsHelper::JOB_SYNCHRONIZE_STOCK_WITH_MARKETPLACE] != true) {
+        if ($this->settings[PluginSettingsHelper::JOB_SYNCHRONIZE_STOCK_WITH_MARKETPLACE] !== true) {
             return;
         }
-        $cronTime = $this->cronTimesRepository->findByType(CronTimesRepository::TYPE_STOCK, strtotime("-30 minutes"));
-        $stockToUpdate = $this->getVariationsFromStockRepository($cronTime->timestamp, $this->settings);
+        $this->cacheWarehouses();
+        $cronTime = $this->cronTimesRepository->findByType(CronTimesRepository::TYPE_STOCK, strtotime('-30 minutes'));
+        $stockToUpdate = $this->getVariationsFromStockRepository($cronTime->timestamp);
         $csv = $this->generateCSV($stockToUpdate);
-        if (!empty($csv)) {
+        if ($csv) {
             $this->uploadFile($csv, $this->settings);
         }
         $this->cronTimesRepository->update($cronTime);
@@ -91,13 +109,13 @@ class SynchronizeStockWithMarketplace extends CronHandler
     /**
      * Gets stock variations from repository
      *
-     * @param int   $timestamp
-     * @param array $settings
+     * @param int $timestamp
      *
      * @return array
      */
-    public function getVariationsFromStockRepository(int $timestamp, array $settings): array
+    public function getVariationsFromStockRepository(int $timestamp): array
     {
+        /** @var StockRepositoryContract $stockRepositoryContract */
         $stockRepositoryContract = pluginApp(StockRepositoryContract::class);
         $stockRepositoryContract->setFilters([
             'updatedAtFrom' => date(DateTime::W3C, $timestamp)
@@ -109,7 +127,6 @@ class SynchronizeStockWithMarketplace extends CronHandler
         ];
 
         $variations = [];
-
         $isLastPage = false;
         while (!$isLastPage) {
             $variationsByWarehouseType = $stockRepositoryContract->listStockByWarehouseType(
@@ -122,16 +139,12 @@ class SynchronizeStockWithMarketplace extends CronHandler
             $isLastPage = $variationsByWarehouseType->isLastPage();
             ++$variationSearchParams['page'];
 
-            /** @var  PaginatedResult $variationsByWarehouseType */
             foreach ($variationsByWarehouseType->getResult() as $stock) {
-                $variationInfo = $this->variationInformation(
-                    $stock,
-                    $settings
-                );
-                if (!$variationInfo) {
+                $variation = $this->variationInformation($stock);
+                if (!$variation) {
                     continue;
                 }
-                $variations[] = $variationInfo;
+                $variations[] = $variation;
             }
         }
         $stockRepositoryContract->clearFilters();
@@ -143,12 +156,10 @@ class SynchronizeStockWithMarketplace extends CronHandler
     /**
      * Gets variation information
      *
-     * @param       $stock
-     * @param array $settings
-     *
+     * @param Stock $stock
      * @return array
      */
-    private function variationInformation($stock, array $settings): array
+    private function variationInformation(Stock $stock): array
     {
         try {
             $variation = $this->variationRepositoryContract->findById($stock->variationId);
@@ -159,16 +170,27 @@ class SynchronizeStockWithMarketplace extends CronHandler
         $variationSkus = $variation->variationSkus->where(
             "marketId",
             "=",
-            $settings[PluginSettingsHelper::REFERRER_ID]
+            $this->settings[PluginSettingsHelper::REFERRER_ID]
         )->first();
         if (!$variationSkus) {
             return [];
         }
-        $price = $this->priceHelper->getPrice($stock['variationId'], $settings);
+        $price = $this->priceHelper->getPrice($stock->variationId, $this->settings);
+
+        $physicalStock = 0;
+        $variationStocks = $this->variationStockRepositoryContract->listStockByWarehouse($variation->id, ['*']);
+        foreach ($variationStocks as $variationStock) {
+            /** @var VariationStock $variationStock */
+            $warehouseAccess = @$this->warehouses[$variationStock->warehouseId] ?: false;
+            if (!$warehouseAccess) {
+                continue;
+            }
+            $physicalStock += $variationStock->netStock;
+        }
 
         return [
             'variation_sku' => $variationSkus->sku,
-            'stockNet' => $stock->stockNet,
+            'stockNet' => $physicalStock,
             'price' => $price->price > 0 ? $price->price : 0.0,
         ];
     }
@@ -243,6 +265,23 @@ class SynchronizeStockWithMarketplace extends CronHandler
                     'Information' => $upload['message']
                 ]
             );
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function cacheWarehouses(): void
+    {
+        $warehouses = $this->warehouseRepositoryContract->all();
+        /** @var Warehouse $warehouse */
+        foreach ($warehouses as $warehouse) {
+            if (in_array($this->settings[PluginSettingsHelper::REFERRER_ID], $warehouse->allocationReferrerIds) || in_array(-1, $warehouse->allocationReferrerIds)) {
+                $this->warehouses[$warehouse->id] = true;
+                continue;
+            }
+
+            $this->warehouses[$warehouse->id] = false;
         }
     }
 }

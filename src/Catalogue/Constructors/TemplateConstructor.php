@@ -23,21 +23,10 @@ class TemplateConstructor
     const FILTERS = 'filters';
 
     const FIELD_TO_IGNORE = ['aid', 'pid'];
-    /**
-     * @var
-     */
+
     private $catalogBase;
-    /**
-     * @var
-     */
     private $catalogByKey;
-    /**
-     * @var
-     */
     private $catalogSettings = [];
-    /**
-     * @var
-     */
     private $catalogFilters = [];
     /**
      * @var CatalogueBuilderHelper
@@ -121,11 +110,11 @@ class TemplateConstructor
      */
     public function checkBases(): array
     {
-        if(!self::FIELD_TO_IGNORE){
+        if (!self::FIELD_TO_IGNORE) { /** @phpstan-ignore-line */
             return $this->catalogBase;
         }
 
-        foreach ($this->catalogBase as $baseKey => $base){
+        foreach ($this->catalogBase as $baseKey => $base) {
             foreach ($this->catalogBase[$baseKey]['values'] as $key => $value) {
                 if (in_array($value['key'], self::FIELD_TO_IGNORE)) {
                     unset($this->catalogBase[$baseKey]['values'][$key]);

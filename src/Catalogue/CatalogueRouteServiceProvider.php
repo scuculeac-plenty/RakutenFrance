@@ -25,6 +25,7 @@ class CatalogueRouteServiceProvider extends RouteServiceProvider
                 $apiRouter->get(PluginConfiguration::PLUGIN_NAME . '/catalog/template/new', CatalogueController::class . '@new');
                 $apiRouter->get(PluginConfiguration::PLUGIN_NAME . '/catalog/export/raw', CatalogueController::class . '@raw');
                 $apiRouter->get(PluginConfiguration::PLUGIN_NAME . '/catalog/export/generate', CatalogueController::class . '@generate');
-            });
+            }
+        );
     }
 }

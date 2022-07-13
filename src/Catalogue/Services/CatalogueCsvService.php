@@ -3,13 +3,13 @@
 namespace RakutenFrance\Catalogue\Services;
 
 use Carbon\Carbon;
-use Illuminate\Support\Collection;
-use Plenty\Modules\Catalog\Models\CatalogExportResult;
 use Plenty\Plugin\Log\Loggable;
-use RakutenFrance\Catalogue\Constructors\TemplateConstructor;
-use RakutenFrance\Catalogue\Converters\LazyConverter;
-use RakutenFrance\Catalogue\Helpers\CatalogueExportHelper;
+use Illuminate\Support\Collection;
 use RakutenFrance\Helpers\PluginSettingsHelper;
+use RakutenFrance\Catalogue\Converters\LazyConverter;
+use Plenty\Modules\Catalog\Models\CatalogExportResult;
+use RakutenFrance\Catalogue\Helpers\CatalogueExportHelper;
+use RakutenFrance\Catalogue\Constructors\TemplateConstructor;
 
 class CatalogueCsvService extends CatalogueExportHelper
 {
@@ -17,7 +17,6 @@ class CatalogueCsvService extends CatalogueExportHelper
 
     private $CSV = '';
     private $settings;
-    private $catalogErrorsRepository;
 
     /**
      * Exports catalog as CSV
@@ -54,6 +53,7 @@ class CatalogueCsvService extends CatalogueExportHelper
         }
 
         $catalogService = $this->exportCatalogById($catalog['id']);
+        /** @phpstan-ignore-next-line */
         $catalogService->setUpdatedSince($timestamp ? Carbon::createFromTimestamp($timestamp) : Carbon::now()->subDay());
         $catalogService->setPage($page);
         $catalogService->setItemsPerPage(500);
@@ -65,7 +65,7 @@ class CatalogueCsvService extends CatalogueExportHelper
         /** @var LazyConverter $lazyConverter */
         $lazyConverter = pluginApp(LazyConverter::class);
         $lazyLoader = $lazyConverter->fromCatalogExportResult($catalogResult)->getSourceCollection();
-        $lazyLoader->each(function ($chuck) use ($catalogMap, $alias, $requiredFields, $validate) {
+        $lazyLoader->each(function ($chuck) use ($catalogMap, $requiredFields, $validate) {
             foreach ($chuck as $variation) {
                 $checkRequiredFields = $this->isValidVariation($requiredFields, $variation);
                 if (!$checkRequiredFields['valid'] && $validate) {
@@ -126,6 +126,7 @@ class CatalogueCsvService extends CatalogueExportHelper
                 }
             }
 
+            /** @phpstan-ignore-next-line */
             $marketplaceCollection = Collection::make($image['availabilities'])->where('type', '=', 'marketplace');
             $check = $marketplaceCollection->whereIn('value', [$referrerId, -1])->isNotEmpty();
             if ($check) {

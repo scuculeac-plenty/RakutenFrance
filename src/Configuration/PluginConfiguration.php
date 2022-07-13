@@ -6,10 +6,11 @@ class PluginConfiguration
 {
     // Env
     const PRODUCTION_MODE = true;
+    /** @phpstan-ignore-next-line */
     const ENVIRONMENT = self::PRODUCTION_MODE ? 'https://ws.fr.shopping.rakuten.com' : 'https://sandbox.fr.shopping.rakuten.com';
 
     // Plugin
-    const PLUGIN_VERSION = '1.0.11';
+    const PLUGIN_VERSION = '1.0.12';
     const PLUGIN_NAME = 'RakutenFrance';
     const REFERRER_NAME = 'Rakuten.fr';
     const PLUGIN_KEY = 'hashtagESRakutenFrance';

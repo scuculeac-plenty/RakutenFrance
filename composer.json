@@ -1,0 +1,18 @@
+{
+    "name": "hashtages/maileon",
+    "require-dev": {
+        "hashtages/plugin-interface": "dev-main",
+        "hashtages/plugin-collection-generator": "dev-main",
+        "phpstan/phpstan": "^1.2",
+        "friendsofphp/php-cs-fixer": "^3.0"
+    },
+    "require": {
+        "ext-json": "*"
+    },
+    "scripts": {
+        "psr": "vendor/bin/php-cs-fixer fix -vvv",
+        "psr-dry": "vendor/bin/php-cs-fixer fix --dry-run -vvv",
+        "psr-diff": "vendor/bin/php-cs-fixer fix --dry-run -vvv --diff",
+        "phpstan": "php -d memory_limit=512M vendor/bin/phpstan analyse -c phpstan.neon"
+    }
+}

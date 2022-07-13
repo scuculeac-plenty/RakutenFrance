@@ -50,11 +50,11 @@ class SynchronizeCatalogUploadFeed extends CronHandler
 
     public function handle()
     {
-        $this->getLogger(__METHOD__)->error( "Catalogue export started", 'started');
+        $this->getLogger(__METHOD__)->error("Catalogue export started", 'started');
         try {
             $catalogLists = $this->catalogRepository->get();
             if ($this->settings[PluginSettingsHelper::JOB_SYNCHRONIZE_FEED_TO_MARKETPLACE] != true) {
-                $this->getLogger(__METHOD__)->error( "Toggle off", 'Im here');
+                $this->getLogger(__METHOD__)->error("Toggle off", 'Im here');
                 return;
             }
             foreach ($catalogLists as $catalog) {
@@ -69,10 +69,8 @@ class SynchronizeCatalogUploadFeed extends CronHandler
                     PluginConfiguration::PLUGIN_NAME . '::catalogueExport.catalogInformation',
                     ['alias' => $catalog->alias, 'total' => $totalItemsConstructed]
                 );
-                $this->getLogger(__METHOD__)->error( "Catalogue export ended", 'end');
+                $this->getLogger(__METHOD__)->error("Catalogue export ended", 'end');
             }
-
-        
         } catch (Exception $e) {
             $this->getLogger(__METHOD__)->error(PluginConfiguration::PLUGIN_NAME . '::log.exception', $e->getMessage());
         }

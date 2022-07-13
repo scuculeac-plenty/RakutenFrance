@@ -23,9 +23,9 @@ class PluginSettingsHelper
     const CANCEL_TEXT = AssistantWizard::VALUE_CANCELLATION_TEXT;
     const PLENTY_ACCOUNT_ID = AssistantWizard::VALUE_PLENTY_ACCOUNT_ID;
     const PROFILE_STOCK_ID = AssistantWizard::VALUE_RAKUTEN_PROFILE_STOCK_ID;
+    const APPLICATION_ID = AssistantWizard::VALUE_RAKUTEN_PLENTY_ID;
     const REFERRER_ID = 'referrerId';
     const METHOD_OF_PAYMENT_ID = 'methodOfPayment';
-    const APPLICATION_ID = 'plentyId';
 
     const JOB_SYNCHRONIZE_MARKETPLACE_ORDERS = AssistantWizard::VALUE_JOB_SYNCHRONIZE_MARKETPLACE_ORDERS;
     const JOB_SYNCHRONIZE_STOCK_WITH_MARKETPLACE = AssistantWizard::VALUE_JOB_SYNCHRONIZE_STOCK_WITH_MARKETPLACE;
@@ -56,7 +56,6 @@ class PluginSettingsHelper
     {
         $this->settings['referrerId'] = $this->getReferrerId(PluginConfiguration::REFERRER_NAME);
         $this->settings['methodOfPayment'] = $this->getMethodOfPaymentId(PluginConfiguration::PLUGIN_NAME);
-        $this->settings['plentyId'] = $this->getApplicationId();
 
         return $this->settings;
     }
@@ -96,15 +95,5 @@ class PluginSettingsHelper
         }
 
         return 0;
-    }
-
-    /**
-     * Gets application Id
-     *
-     * @return int
-     */
-    private function getApplicationId(): int
-    {
-        return pluginApp(Application::class)->getPlentyId();
     }
 }

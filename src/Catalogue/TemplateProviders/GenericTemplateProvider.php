@@ -65,11 +65,13 @@ class GenericTemplateProvider extends AbstractGroupedTemplateProvider
         if ($mappings[TemplateConstructor::MAPPINGS_BASE]) {
             foreach ($mappings[TemplateConstructor::MAPPINGS_BASE] as $baseKey => $catalogBase) {
                 /** @var TemplateGroup $simpleGroup */
-                $simpleGroup = pluginApp(TemplateGroup::class,
+                $simpleGroup = pluginApp(
+                    TemplateGroup::class,
                     [
                         "identifier" => $baseKey,
                         "label" => ucfirst($catalogBase['label'])
-                    ]);
+                    ]
+                );
 
                 foreach ($catalogBase['values'] as $base) {
                     $simpleTemplateField = pluginApp(SimpleTemplateField::class, [
@@ -90,11 +92,13 @@ class GenericTemplateProvider extends AbstractGroupedTemplateProvider
         if ($mappings[TemplateConstructor::MAPPINGS_KEY]) {
             foreach ($mappings[TemplateConstructor::MAPPINGS_KEY] as $byKey => $catalogKey) {
                 /** @var TemplateGroup $complexGroup */
-                $complexGroup = pluginApp(TemplateGroup::class,
+                $complexGroup = pluginApp(
+                    TemplateGroup::class,
                     [
                         "identifier" => $byKey,
                         "label" => ucfirst($catalogKey['label'])
-                    ]);
+                    ]
+                );
 
                 /** @var GenericComplexFieldProvider $genericComplexFieldProvider */
                 $genericComplexFieldProvider = pluginApp(GenericComplexFieldProvider::class);
@@ -125,7 +129,7 @@ class GenericTemplateProvider extends AbstractGroupedTemplateProvider
         $container = pluginApp(CatalogFilterBuilderContainer::class);
         foreach ($this->genericTemplateProvider[TemplateConstructor::FILTERS] as $filter) {
             switch ($filter['name']) {
-                case CatalogueFiltersHelper::VARIATION_ACTIvE:
+                case CatalogueFiltersHelper::VARIATION_ACTIVE:
                     /** @var VariationFilterBuilderFactory $filterBuilderFactory */
                     $filterBuilderFactory = pluginApp(VariationFilterBuilderFactory::class);
                     $variationIsActiveFilter = $filterBuilderFactory->variationIsActive();
@@ -179,4 +183,3 @@ class GenericTemplateProvider extends AbstractGroupedTemplateProvider
         return $container;
     }
 }
-

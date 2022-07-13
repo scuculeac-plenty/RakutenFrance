@@ -76,7 +76,8 @@ class RakutenExportCSV extends CatalogueExportHelper
                 /** Building logic goes here */
                 $variationId = $variation['variationId'];
                 if (!$variationId) {
-                    $this->getLogger(__METHOD__)->error(PluginConfiguration::PLUGIN_NAME . '::log.noVariationId',
+                    $this->getLogger(__METHOD__)->error(
+                        PluginConfiguration::PLUGIN_NAME . '::log.noVariationId',
                         ['alias' => CreateRakutenEANCatalog::RAKUTEN_EAN_CATALOG]
                     );
                     continue;
@@ -98,7 +99,7 @@ class RakutenExportCSV extends CatalogueExportHelper
             }
         });
 
-        return $this->itemsConstructed > 0 ? $this->CSV : false;
+        return $this->itemsConstructed > 0 ? $this->CSV : false; /** @phpstan-ignore-line */
     }
 
     /**
@@ -149,6 +150,7 @@ class RakutenExportCSV extends CatalogueExportHelper
                 }
             }
 
+            /** @phpstan-ignore-next-line */
             $marketplaceCollection = Collection::make($image['availabilities'])->where('type', '=', 'marketplace');
             $check = $marketplaceCollection->whereIn('value', [$referrerId, -1])->isNotEmpty();
             if ($check) {

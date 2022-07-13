@@ -120,7 +120,7 @@ class CatalogHistoryRepository
      */
     public function getLastUpload(string $type, string $alias): Carbon
     {
-        /** @var CatalogHistory $catalogHistory */
+        /** @var CatalogHistory|null $catalogHistory */
         $catalogHistory = $this->database
             ->query(CatalogHistory::class)
             ->where('type', '=', $type)

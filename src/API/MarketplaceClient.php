@@ -98,7 +98,7 @@ class MarketplaceClient extends Api
     /**
      * Get shipping information from API.
      *
-     * @param int $purchaseId
+     * @param string $purchaseId
      *
      * @return array
      * @throws Exception
@@ -117,7 +117,7 @@ class MarketplaceClient extends Api
     /**
      * Get billing information from API.
      *
-     * @param int $purchaseId
+     * @param string $purchaseId
      *
      * @return array
      * @throws Exception
@@ -192,7 +192,7 @@ class MarketplaceClient extends Api
     public function getOrders(): array
     {
         $response = $this->call(self::GET_NEW_SALES, self::SALES_WS, self::MARKETPLACE_ORDERS_VERSION);
-       
+
         if (empty($response) || empty($response['sales']['sale'])) {
             return [];
         }

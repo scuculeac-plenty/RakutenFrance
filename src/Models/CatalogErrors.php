@@ -4,6 +4,7 @@ namespace RakutenFrance\Models;
 
 use Plenty\Modules\Plugin\DataBase\Contracts\Model;
 use RakutenFrance\Configuration\PluginConfiguration;
+
 /**
  * Class CatalogErrors
  *

@@ -9,9 +9,6 @@ namespace RakutenFrance\Catalogue\Helpers;
  */
 class CatalogueDefaultValueHelper
 {
-    /**
-     * @var
-     */
     private $sources = [];
 
     /**

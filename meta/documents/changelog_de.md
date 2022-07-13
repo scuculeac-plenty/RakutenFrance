@@ -1,5 +1,13 @@
 # Release Notes - Rakuten.fr
 
+## v1.0.12 (2022-04-15)
+
+- Geänderte Aufteilung der Bestelladresse für Bestellungen
+- Geänderte Länderzuordnung bei Bestellungen (Primär:LandAlpha2 und Fallback:Land)
+- Geänderter Lagerfilter nach Lagerreferenz
+- Korrekte Zuweisung von plentyId für Bestellungen aus den Assistenteneinstellungen behoben
+- `ShippingOrderEventProcedure` für PHP8 korrigiert
+
 ## v1.0.11 (2021-11-26)
 
 - Konverter zum Katalog hinzugefügt

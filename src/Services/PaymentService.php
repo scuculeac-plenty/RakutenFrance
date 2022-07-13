@@ -75,6 +75,8 @@ class PaymentService
                 'error' => $e->getMessage(),
             ]);
         }
+
+        return null;
     }
 
     /**
@@ -102,5 +104,7 @@ class PaymentService
                 'error' => $e->getMessage(),
             ]);
         }
+
+        return null;
     }
 }

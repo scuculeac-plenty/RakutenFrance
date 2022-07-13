@@ -30,12 +30,12 @@ class PriceHelper
     /**
      * Gets variation price
      *
-     * @param $variationId
-     * @param $settings
+     * @param int $variationId
+     * @param array $settings
      *
      * @return SalesPriceSearchResponse
      */
-    public function getPrice($variationId, $settings)
+    public function getPrice(int $variationId, array $settings): SalesPriceSearchResponse
     {
         /**
          * SalesPriceSearchRequest $salesPriceSearchRequest
@@ -45,7 +45,6 @@ class PriceHelper
             $salesPriceSearchRequest->variationId = $variationId;
             $salesPriceSearchRequest->plentyId = $settings[PluginSettingsHelper::APPLICATION_ID];
             $salesPriceSearchRequest->referrerId = $settings[PluginSettingsHelper::REFERRER_ID];
-            //$salesPriceSearchRequest->type = 'default';
         }
         return $this->salesPriceSearchRepositoryContract->search($salesPriceSearchRequest);
     }
