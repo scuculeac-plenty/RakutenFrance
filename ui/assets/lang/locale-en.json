@@ -1,0 +1,11 @@
+{
+    "search": "Search",
+    "noResult": "No result",
+    "noResultDescription": "Press search to get entries",
+    "loading": "Loading...",
+    "variationId": "Variation ID",
+    "method": "Method",
+    "errors": "Issues",
+    "show": "Show",
+    "format": "Format"
+}

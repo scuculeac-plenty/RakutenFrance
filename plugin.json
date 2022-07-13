@@ -1,0 +1,45 @@
+{
+  "name": "RakutenFrance",
+  "marketplaceName": {
+    "de": "Rakuten.fr",
+    "en": "Rakuten.fr"
+  },
+  "namespace": "RakutenFrance",
+  "type": "backend",
+  "version": "1.0.11",
+  "license": "Copyright by hashtagES",
+  "isClosedSource": true,
+  "price": 0.00,
+  "description": "Join the Rakuten Shopping Mall within 8 500 professional merchants and present your personalized shop to 10 million Club R members. Design your own Rakuten Corner, a space entirely dedicated to your products, and offer your clients 3 % in Rakuten Points for all your catalogue, entirely financed by Rakuten.",
+  "shortDescription": {
+    "de": "Schließe dich an den Rakuten Marktplatz an mit über 8.500 professionellen Händlern an und präsentiere deinen eigenen personalisierten Shop den 10 Millionen Club R Mitgliedern. Gestalte dabei deinen eigenen Shop, der ausschließlich euren Produkten gewidmet ist und bietet euren Rakuten Kunden dabei 3 % Rakuten- Punkte für den gesamten Katalog, der vollständig von Rakuten finanziert wird.",
+    "en": "Join the Rakuten Shopping Mall within 8 500 professional merchants and present your personalized shop to 10 million Club R members. Design your own Rakuten Corner, a space entirely dedicated to your products, and offer your clients 3 % in Rakuten Points for all your catalogue, entirely financed by Rakuten."
+  },
+  "categories": [
+    "3881"
+  ],
+  "keywords": [
+    "plugins",
+    "Rakuten",
+    "items",
+    "Rakuten",
+    "France",
+    "marketplace",
+    "hashtages",
+    "orders"
+  ],
+  "author": "hashtagES GmbH",
+  "authorIcon": "icon_author_xs.png",
+  "pluginIcon": "icon_plugin_md.png",
+  "email": "hello@hashtages.com",
+  "phone": "+49 (0) 4264-776949-5",
+  "serviceProvider": "RakutenFrance\\Providers\\PluginServiceProvider",
+  "runOnBuild": [
+    "RakutenFrance\\Catalogue\\Database\\Migrations\\CreateCatalogTable",
+    "RakutenFrance\\Catalogue\\Database\\Migrations\\CreateCatalogHistoryTable",
+    "RakutenFrance\\Migrations\\CreateMarketplaceReferrer",
+    "RakutenFrance\\Migrations\\CreateMarketplacePaymentMethod",
+    "RakutenFrance\\Migrations\\CreateCronTimesTable",
+    "RakutenFrance\\Migrations\\CreateCatalogErrorsTable"
+  ]
+}

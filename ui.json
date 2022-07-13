@@ -1,0 +1,12 @@
+{
+    "defaultEntryPoint": "index.html",
+    "namespace": "RakutenFrance",
+    "menuEntries": [
+        {
+            "label": "frontend.catalogErrors",
+            "menu": "settings/markets/Rakuten.fr",
+            "urlKey": "catalog-errors",
+            "entryPoint": "index.html#/RakutenFrance/catalog-errors"
+        }
+    ]
+}
